@@ -1,0 +1,23 @@
+# Managed by helix/scripts/e2e/setup-github-sandbox.mjs. Do not edit by hand.
+name: Helix E2E sandbox
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  marker:
+    name: Add CI_FIXED.md at the repository root containing the word fixed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - name: Require CI_FIXED.md
+        run: |
+          if grep -qiw fixed CI_FIXED.md 2>/dev/null; then
+            echo "CI_FIXED.md found."
+          else
+            echo "::error file=CI_FIXED.md::Add CI_FIXED.md at the repository root containing the word fixed."
+            exit 1
+          fi
