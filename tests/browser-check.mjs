@@ -53,9 +53,30 @@ async function main() {
   let failed = false;
   try {
     const page = await browser.newPage();
+
+    // Pin a deterministic browser clock so "Mark watered" cannot be a no-op:
+    // the plant is added at ADD_TIME, then the clock is advanced several days
+    // before watering so the recomputed last-watered + next-due must change.
+    const STORAGE_KEY = 'plant-watering-tracker/v1';
+    const DAY = 24 * 60 * 60 * 1000;
+    const ADD_TIME = Date.UTC(2026, 0, 10, 9, 0, 0); // Jan 10 2026 09:00 UTC
+    const WATER_TIME = ADD_TIME + 8 * DAY; // 8 days later
+    const addIso = new Date(ADD_TIME).toISOString();
+    const waterIso = new Date(WATER_TIME).toISOString();
+
+    await page.clock.install();
+    await page.clock.setFixedTime(ADD_TIME);
     await page.goto(`${baseUrl}/index.html`);
 
-    // Add a plant.
+    // Read the single stored plant's lastWatered straight from localStorage.
+    const readLastWatered = () =>
+      page.evaluate((key) => {
+        const raw = window.localStorage.getItem(key);
+        const list = raw ? JSON.parse(raw) : [];
+        return list[0] ? list[0].lastWatered : null;
+      }, STORAGE_KEY);
+
+    // Add a plant (last-watered = ADD_TIME).
     await page.fill('#plant-name', 'Fiddle Leaf Fig');
     await page.fill('#plant-interval', '5');
     await page.click('#add-form button[type="submit"]');
@@ -64,13 +85,27 @@ async function main() {
     await plant.waitFor();
     assert.equal(await page.locator('.plant').count(), 1, 'one plant after add');
 
-    // Mark it watered and capture the resulting due-state.
+    const lastWateredBefore = await readLastWatered();
+    const dueBeforeWater = await plant.locator('.plant__due').textContent();
+    assert.equal(lastWateredBefore, addIso, 'last-watered recorded at add time');
+
+    // Advance the clock, THEN mark watered — so the water action has a visible,
+    // asserted effect on last-watered and the next due date.
+    await page.clock.setFixedTime(WATER_TIME);
     await plant.locator('.btn--water').click();
+
+    // The displayed due date must update once the plant has been re-watered.
+    await plant.locator('.plant__due').filter({ hasNotText: dueBeforeWater }).waitFor();
     const stateAfterWater = await plant.locator('.badge').getAttribute('data-state');
     const dueAfterWater = await plant.locator('.plant__due').textContent();
-    assert.equal(stateAfterWater, 'upcoming', 'freshly watered plant is upcoming');
+    const lastWateredAfter = await readLastWatered();
 
-    // Reload the page fully.
+    assert.equal(stateAfterWater, 'upcoming', 'freshly watered plant is upcoming');
+    assert.equal(lastWateredAfter, waterIso, 'water updates last-watered to the new "now"');
+    assert.notEqual(lastWateredAfter, lastWateredBefore, 'last-watered actually changed');
+    assert.notEqual(dueAfterWater, dueBeforeWater, 'next due date actually changed');
+
+    // Reload the page fully (clock stays fixed at WATER_TIME).
     await page.reload();
 
     const plantAfterReload = page.locator('.plant', { hasText: 'Fiddle Leaf Fig' });
@@ -84,10 +119,12 @@ async function main() {
 
     const stateAfterReload = await plantAfterReload.locator('.badge').getAttribute('data-state');
     const dueAfterReload = await plantAfterReload.locator('.plant__due').textContent();
+    const lastWateredAfterReload = await readLastWatered();
     assert.equal(stateAfterReload, stateAfterWater, 'due-state recomputes the same after reload');
     assert.equal(dueAfterReload, dueAfterWater, 'next due date recomputes the same after reload');
+    assert.equal(lastWateredAfterReload, waterIso, 'advanced last-watered persists across reload');
 
-    console.log('✔ browser check passed: add -> water -> reload persists the plant and its state');
+    console.log('✔ browser check passed: add -> advance clock -> water -> reload persists the updated plant and state');
   } catch (err) {
     failed = true;
     console.error('✖ browser check failed:', err.message);
