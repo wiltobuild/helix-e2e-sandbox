@@ -1,0 +1,75 @@
+name: Event finder product checks
+
+on:
+  pull_request:
+    paths:
+      - event-finder/**
+      - package.json
+      - package-lock.json
+      - .github/workflows/event-finder.yml
+
+permissions:
+  contents: read
+
+jobs:
+  event-finder:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Require the foundation contract and tests
+        shell: bash
+        run: |
+          for path in \
+            event-finder/src/events.js \
+            event-finder/src/filters.js \
+            event-finder/src/fixtures.js \
+            event-finder/tests/contract.test.js \
+            event-finder/tests/filters.test.js; do
+            test -f "$path" || { echo "Missing event-finder foundation file: $path" >&2; exit 1; }
+          done
+      - name: Preserve plant tracker tests
+        run: npm test
+      - name: Event contract and state tests
+        shell: bash
+        run: |
+          set -o pipefail
+          node --test --test-reporter=tap "event-finder/tests/**/*.test.js" | tee event-tests.log
+          grep -Eq '^# pass [1-9][0-9]*$' event-tests.log
+          grep -Eq '^# skipped 0$' event-tests.log
+      - name: Browser tests when their owned slices exist
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git cat-file -e "$BASE_SHA^{commit}"
+          for path in \
+            event-finder/src/browse.js \
+            event-finder/tests/browse.browser.mjs \
+            event-finder/index.html \
+            event-finder/tests/acceptance.browser.mjs; do
+            if git cat-file -e "$BASE_SHA:$path" 2>/dev/null && [[ ! -f "$path" ]]; then
+              echo "Previously required event-finder file was removed: $path" >&2
+              exit 1
+            fi
+          done
+          if [[ -f event-finder/src/browse.js || -f event-finder/tests/browse.browser.mjs || -f event-finder/index.html || -f event-finder/tests/acceptance.browser.mjs ]]; then
+            npx playwright install --with-deps chromium
+          fi
+          if [[ -f event-finder/src/browse.js || -f event-finder/tests/browse.browser.mjs ]]; then
+            test -f event-finder/src/browse.js
+            test -f event-finder/tests/browse.browser.mjs
+            npm run test:events:browse
+          fi
+          if [[ -f event-finder/index.html || -f event-finder/tests/acceptance.browser.mjs ]]; then
+            test -f event-finder/index.html
+            test -f event-finder/tests/acceptance.browser.mjs
+            npm run test:events:acceptance
+          fi
