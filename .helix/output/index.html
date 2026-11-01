@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plant Watering Tracker</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="page__header">
+        <h1>🪴 Plant Watering Tracker</h1>
+        <p>Add your plants, set how often they need water, and never forget again.</p>
+      </header>
+
+      <p id="storage-note" class="storage-note" hidden>
+        Storage is unavailable in this environment — plants you add won’t persist after a reload.
+      </p>
+
+      <section class="card" aria-labelledby="add-heading">
+        <h2 id="add-heading" class="section-title">Add a plant</h2>
+        <form id="add-form" class="add-form" novalidate>
+          <div class="field">
+            <label for="plant-name">Plant name</label>
+            <input
+              id="plant-name"
+              name="name"
+              type="text"
+              placeholder="e.g. Monstera"
+              autocomplete="off"
+              required
+            />
+          </div>
+          <div class="field field--interval">
+            <label for="plant-interval">Water every (days)</label>
+            <input
+              id="plant-interval"
+              name="interval"
+              type="number"
+              min="1"
+              step="1"
+              value="7"
+              inputmode="numeric"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn--primary">Add plant</button>
+        </form>
+        <p id="form-error" class="form-error" role="alert" aria-live="polite"></p>
+      </section>
+
+      <section aria-labelledby="list-heading">
+        <h2 id="list-heading" class="section-title">Your plants</h2>
+        <p id="empty-state" class="empty-state">No plants yet — add one above to get started.</p>
+        <ul id="plant-list" class="plant-list"></ul>
+      </section>
+    </main>
+
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>

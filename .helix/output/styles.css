@@ -1,0 +1,259 @@
+:root {
+  --bg: #f4f7f2;
+  --card: #ffffff;
+  --ink: #1f2a24;
+  --muted: #5c6b63;
+  --line: #dfe7df;
+  --accent: #2f7d4f;
+  --accent-ink: #ffffff;
+  --overdue: #b4432f;
+  --overdue-bg: #fbe8e4;
+  --due: #b8860b;
+  --due-bg: #fbf3df;
+  --upcoming: #2f7d4f;
+  --upcoming-bg: #e4f3e9;
+  --shadow: 0 1px 3px rgba(31, 42, 36, 0.08), 0 4px 16px rgba(31, 42, 36, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.page__header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.page__header h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.75rem;
+}
+
+.page__header p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.add-form {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.field input {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #fff;
+  color: var(--ink);
+}
+
+.field input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.field--interval input {
+  width: 6.5rem;
+}
+
+.btn {
+  padding: 0.55rem 0.9rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #eef2ee;
+  color: var(--ink);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.btn--primary:hover {
+  filter: brightness(1.05);
+}
+
+.btn--water {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.btn--remove {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+.form-error {
+  color: var(--overdue);
+  min-height: 1.25rem;
+  margin: 0.6rem 0 0;
+  font-size: 0.9rem;
+}
+
+.storage-note {
+  margin: 0 0 1.25rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  background: var(--due-bg);
+  color: var(--due);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  margin: 0 0 0.75rem;
+}
+
+.plant-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.plant {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--line);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  box-shadow: var(--shadow);
+}
+
+.plant--overdue {
+  border-left-color: var(--overdue);
+}
+
+.plant--due-today {
+  border-left-color: var(--due);
+}
+
+.plant--upcoming {
+  border-left-color: var(--upcoming);
+}
+
+.plant__info {
+  min-width: 0;
+}
+
+.plant__name {
+  margin: 0 0 0.15rem;
+  font-size: 1.05rem;
+}
+
+.plant__meta,
+.plant__due {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.badge {
+  display: inline-block;
+  margin-top: 0.4rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.badge--overdue {
+  background: var(--overdue-bg);
+  color: var(--overdue);
+}
+
+.badge--due-today {
+  background: var(--due-bg);
+  color: var(--due);
+}
+
+.badge--upcoming {
+  background: var(--upcoming-bg);
+  color: var(--upcoming);
+}
+
+.plant__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.empty-state {
+  color: var(--muted);
+  text-align: center;
+  padding: 1rem 0;
+  margin: 0;
+}
+
+@media (max-width: 520px) {
+  .add-form {
+    grid-template-columns: 1fr;
+  }
+  .field--interval input {
+    width: 100%;
+  }
+  .plant {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .plant__actions {
+    flex-direction: row;
+  }
+}
