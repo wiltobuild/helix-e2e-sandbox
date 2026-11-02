@@ -166,6 +166,21 @@ async function main() {
     assert.match(await details.locator('[data-details-description]').textContent(), /Synthetic sample only/, 'details description');
     assert.equal(await details.locator('[data-details-date]').count(), 1, 'details show the date/time');
 
+    // The details favourite toggle must sit within the details card (normal
+    // flow), not escape to the initial containing block via position:absolute.
+    const detailsFav = details.locator('[data-fav-toggle="sample-jazz"]');
+    const detailsCard = details.locator('.event-details__card');
+    const favBox = await detailsFav.boundingBox();
+    const cardBox = await detailsCard.boundingBox();
+    assert.ok(favBox && cardBox, 'details favourite and card are laid out');
+    assert.ok(
+      favBox.x >= cardBox.x - 1
+      && favBox.y >= cardBox.y - 1
+      && favBox.x + favBox.width <= cardBox.x + cardBox.width + 1
+      && favBox.y + favBox.height <= cardBox.y + cardBox.height + 1,
+      'details favourite toggle is positioned within the details card',
+    );
+
     // Back returns to the (still topic-filtered) grid.
     await page.click('[data-details-back]');
     await page.locator('[data-event-card="sample-jazz"]').waitFor();
@@ -176,6 +191,12 @@ async function main() {
     assert.equal(await favJazz.getAttribute('aria-pressed'), 'false', 'starts unsaved');
     assert.equal(await page.evaluate(() => window.__storeHas('sample-jazz')), false, 'store starts without the id');
 
+    // The toggle must be reachable in the accessibility tree by role + name,
+    // not just by data-attribute. (Catches the button being aria-hidden.)
+    const saveByRole = page.getByRole('button', { name: /^save .*jazz in the courtyard.* to favourites$/i });
+    await saveByRole.waitFor();
+    assert.equal(await saveByRole.getAttribute('aria-pressed'), 'false', 'a11y: save button starts unpressed');
+
     const togglesBefore = await page.evaluate(() => window.__calls.toggle);
     await favJazz.click();
     // The injected store's toggle() was actually invoked...
@@ -185,6 +206,12 @@ async function main() {
     // ...and the control reflects the store's new membership.
     assert.equal(await favJazz.getAttribute('aria-pressed'), 'true', 'toggle reflects saved state');
     assert.match(await favJazz.locator('[data-fav-state="sample-jazz"]').textContent(), /saved/i, 'label reflects saved');
+
+    // After toggling, the button is still exposed to AT: its accessible name
+    // flips to the remove phrasing and its pressed state reads true.
+    const removeByRole = page.getByRole('button', { name: /^remove .*jazz in the courtyard.* from favourites$/i });
+    await removeByRole.waitFor();
+    assert.equal(await removeByRole.getAttribute('aria-pressed'), 'true', 'a11y: remove button is pressed');
 
     // Toggling again removes it and the UI reflects has()===false again.
     await favJazz.click();

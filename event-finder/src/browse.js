@@ -100,9 +100,9 @@ export function renderCard(event, store) {
     'data-event-card': event.id,
     'data-topic': event.topic,
   }, [
-    el('div', { class: 'event-card__media', 'aria-hidden': 'true' }, [
+    el('div', { class: 'event-card__media' }, [
       el('span', { class: 'event-card__badge', text: 'Demo event' }),
-      el('span', { class: 'event-card__glyph', text: event.topic.charAt(0) }),
+      el('span', { class: 'event-card__glyph', 'aria-hidden': 'true', text: event.topic.charAt(0) }),
       renderFavouriteToggle(event, store),
     ]),
     el('div', { class: 'event-card__body' }, [

@@ -403,6 +403,17 @@
   color: var(--ef-muted);
 }
 
+.event-details__actions {
+  display: flex;
+}
+
+/* The shared .fav-toggle is absolutely positioned for the card media corner;
+   in the details view it belongs in normal flow within the actions area. */
+.event-details__actions .fav-toggle {
+  position: static;
+  box-shadow: none;
+}
+
 /* ---- Focus visibility --------------------------------------------------- */
 .browse button:focus-visible,
 .browse select:focus-visible {
