@@ -1,0 +1,458 @@
+/*
+ * Event finder — browse slice styling.
+ *
+ * Responsive layout for the filter bar and event cards in an editorial
+ * direction (warm paper, bold type, a single warm accent). Scoped under the
+ * browse container classes so it composes cleanly with the integration shell.
+ * Motion is subtle and fully disabled under prefers-reduced-motion.
+ */
+:root {
+  --ef-paper: #f6f1e7;
+  --ef-surface: #fffdf8;
+  --ef-ink: #1b1a17;
+  --ef-muted: #6b6457;
+  --ef-line: #e4dccb;
+  --ef-accent: #e8532a;
+  --ef-accent-soft: #fbe6dd;
+  --ef-fav: #e23b4e;
+  --ef-radius: 14px;
+  --ef-shadow: 0 1px 2px rgba(27, 26, 23, 0.06), 0 12px 28px rgba(27, 26, 23, 0.06);
+  --ef-focus: 0 0 0 3px rgba(232, 83, 42, 0.35);
+}
+
+.browse {
+  box-sizing: border-box;
+  color: var(--ef-ink);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+.browse *,
+.browse *::before,
+.browse *::after {
+  box-sizing: border-box;
+}
+
+/* ---- Filter bar --------------------------------------------------------- */
+.filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+  margin-bottom: 24px;
+  background: var(--ef-surface);
+  border: 1px solid var(--ef-line);
+  border-radius: var(--ef-radius);
+  box-shadow: var(--ef-shadow);
+}
+
+.filter-bar__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 20px;
+}
+
+.filter-bar__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+  flex: 1 1 220px;
+}
+
+.filter-bar__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ef-muted);
+}
+
+.filter-bar__select {
+  appearance: none;
+  width: 100%;
+  padding: 11px 38px 11px 14px;
+  font-size: 0.95rem;
+  color: var(--ef-ink);
+  background-color: var(--ef-paper);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6457' d='M2 4l4 4 4-4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px;
+  border: 1px solid var(--ef-line);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.filter-bar__count {
+  margin: 0;
+  flex: 1 1 auto;
+  text-align: right;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ef-muted);
+}
+
+.filter-bar__reset {
+  flex: 0 0 auto;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ef-ink);
+  background: transparent;
+  border: 1px solid var(--ef-line);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.filter-bar__reset:hover {
+  background: var(--ef-paper);
+  border-color: var(--ef-muted);
+}
+
+.filter-bar__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.topic-chip {
+  padding: 8px 15px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ef-ink);
+  background: var(--ef-paper);
+  border: 1px solid var(--ef-line);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.topic-chip:hover {
+  border-color: var(--ef-muted);
+}
+
+.topic-chip[aria-pressed="true"] {
+  color: var(--ef-surface);
+  background: var(--ef-ink);
+  border-color: var(--ef-ink);
+}
+
+/* ---- Card grid ---------------------------------------------------------- */
+.event-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+}
+
+.event-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--ef-surface);
+  border: 1px solid var(--ef-line);
+  border-radius: var(--ef-radius);
+  box-shadow: var(--ef-shadow);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.event-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 2px 6px rgba(27, 26, 23, 0.08), 0 18px 36px rgba(27, 26, 23, 0.1);
+}
+
+.event-card__media {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(135deg, var(--ef-accent-soft), var(--ef-paper));
+  color: var(--ef-accent);
+}
+
+.event-card__glyph {
+  font-size: 3rem;
+  font-weight: 800;
+  opacity: 0.35;
+}
+
+.event-card__badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 5px 10px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ef-ink);
+  background: var(--ef-surface);
+  border-radius: 6px;
+}
+
+.event-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+}
+
+.event-card__topic {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ef-accent);
+}
+
+.event-card__title {
+  margin: 0;
+  font-size: 1.18rem;
+  line-height: 1.25;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.event-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  color: var(--ef-muted);
+}
+
+.event-card__meta-row {
+  display: flex;
+  gap: 8px;
+}
+
+.event-card__meta dt {
+  flex: 0 0 48px;
+  font-weight: 700;
+  color: var(--ef-ink);
+}
+
+.event-card__meta dd {
+  margin: 0;
+}
+
+.event-card__details-link {
+  align-self: flex-start;
+  margin-top: 8px;
+  padding: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ef-ink);
+  background: none;
+  border: none;
+  border-bottom: 2px solid var(--ef-accent);
+  cursor: pointer;
+}
+
+/* ---- Favourite toggle --------------------------------------------------- */
+.fav-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px 7px 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ef-ink);
+  background: var(--ef-surface);
+  border: 1px solid var(--ef-line);
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(27, 26, 23, 0.12);
+  transition: transform 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.fav-toggle:hover {
+  transform: scale(1.04);
+}
+
+.fav-toggle__icon {
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--ef-fav);
+}
+
+.fav-toggle[aria-pressed="true"] {
+  color: var(--ef-surface);
+  background: var(--ef-fav);
+}
+
+.fav-toggle[aria-pressed="true"] .fav-toggle__icon {
+  color: var(--ef-surface);
+}
+
+/* ---- Empty state -------------------------------------------------------- */
+.event-empty {
+  padding: 48px 24px;
+  text-align: center;
+  background: var(--ef-surface);
+  border: 1px dashed var(--ef-line);
+  border-radius: var(--ef-radius);
+}
+
+.event-empty__title {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.event-empty__hint {
+  margin: 0;
+  color: var(--ef-muted);
+}
+
+/* ---- Details view ------------------------------------------------------- */
+.event-details {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.event-details__back {
+  align-self: flex-start;
+  padding: 9px 16px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--ef-ink);
+  background: var(--ef-surface);
+  border: 1px solid var(--ef-line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.event-details__back:hover {
+  background: var(--ef-paper);
+}
+
+.event-details__card {
+  padding: 28px;
+  background: var(--ef-surface);
+  border: 1px solid var(--ef-line);
+  border-radius: var(--ef-radius);
+  box-shadow: var(--ef-shadow);
+}
+
+.event-details__badge {
+  display: inline-block;
+  padding: 5px 10px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ef-ink);
+  background: var(--ef-accent-soft);
+  border-radius: 6px;
+}
+
+.event-details__topic {
+  margin: 14px 0 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ef-accent);
+}
+
+.event-details__title {
+  margin: 0 0 18px;
+  font-size: clamp(1.6rem, 4vw, 2.3rem);
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.event-details__meta {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin: 0 0 20px;
+  padding: 18px 0;
+  border-top: 1px solid var(--ef-line);
+  border-bottom: 1px solid var(--ef-line);
+}
+
+.event-details__meta dt {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ef-muted);
+}
+
+.event-details__meta dd {
+  margin: 4px 0 0;
+  font-size: 1.02rem;
+  font-weight: 600;
+}
+
+.event-details__description {
+  margin: 0 0 22px;
+  font-size: 1.02rem;
+  line-height: 1.6;
+  color: var(--ef-muted);
+}
+
+.event-details__actions {
+  display: flex;
+}
+
+/* The shared .fav-toggle is absolutely positioned for the card media corner;
+   in the details view it belongs in normal flow within the actions area. */
+.event-details__actions .fav-toggle {
+  position: static;
+  box-shadow: none;
+}
+
+/* ---- Focus visibility --------------------------------------------------- */
+.browse button:focus-visible,
+.browse select:focus-visible {
+  outline: none;
+  box-shadow: var(--ef-focus);
+}
+
+/* ---- Responsive breakpoints -------------------------------------------- */
+@media (min-width: 640px) {
+  .event-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .event-details__meta {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 960px) {
+  .event-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .filter-bar {
+    padding: 22px 24px;
+  }
+}
+
+/* ---- Reduced motion ----------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .browse *,
+  .browse *::before,
+  .browse *::after {
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  .event-card:hover {
+    transform: none;
+  }
+  .fav-toggle:hover {
+    transform: none;
+  }
+}
