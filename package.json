@@ -6,7 +6,10 @@
   "type": "module",
   "scripts": {
     "test": "node --test \"tests/**/*.test.js\"",
-    "test:browser": "node tests/browser-check.mjs"
+    "test:browser": "node tests/browser-check.mjs",
+    "test:events": "node --test \"event-finder/tests/**/*.test.js\"",
+    "test:events:browse": "node event-finder/tests/browse.browser.mjs",
+    "test:events:acceptance": "node event-finder/tests/acceptance.browser.mjs"
   },
   "devDependencies": {
     "playwright": "^1.48.0"
